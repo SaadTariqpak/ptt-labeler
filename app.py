@@ -12,7 +12,7 @@ import re
 
 import streamlit as st
 
-st.set_page_config(page_title="PTT Comment Annotation 留言標註", page_icon=":material/rate_review:", layout="centered")
+st.set_page_config(page_title="Guess the Mood 猜猜網友的心情", page_icon=":material/rate_review:", layout="centered")
 
 import labeler_core as rating  # noqa: E402
 
@@ -75,7 +75,7 @@ def sign_in() -> str | None:
     if os.getenv("LABELER_OPEN_SIGNIN"):  # temporary: raters type their email, nothing is verified. Use Google login for real raters
         if st.session_state.get("open_email"):
             return st.session_state["open_email"]
-        st.title("PTT Comment Annotation · PTT 留言標註")
+        st.title("Guess the Mood · 猜猜網友的心情")
         st.write("請輸入你的 Email 開始。我們只用它來避免重複作答，不會公開。")
         st.caption("Enter your email to start. We only use it to avoid duplicate answers; it is never shown publicly.")
         with st.form("open_signin"):
@@ -85,7 +85,7 @@ def sign_in() -> str | None:
                 st.rerun()
         return None
     if not st.user.get("is_logged_in", False):
-        st.title("PTT Comment Annotation · PTT 留言標註")
+        st.title("Guess the Mood · 猜猜網友的心情")
         st.write("請幫忙看看網友在 PTT 留言時的心情是開心、生氣，還是在酸人。每次 25 則，約 3–5 分鐘，可以隨時停下來，也可以繼續做下一組。")
         st.caption("Read some comments from Taiwan's PTT forum and tell us how the writer feels. 25 comments at a time, about 3–5 minutes, stop whenever you like.")
         st.button("用 Google 帳號登入 Sign in with Google", on_click=st.login, type="primary", icon=":material/login:")
@@ -136,7 +136,7 @@ with st.sidebar:
 
 st.markdown(CSS, unsafe_allow_html=True)
 st.markdown(
-    '<div class="wv-hero"><h1>PTT Comment Annotation<br>PTT 留言標註</h1>'
+    '<div class="wv-hero"><h1>Guess the Mood<br>猜猜網友的心情</h1>'
     "<p>PTT 是台灣最大的網路論壇。請看網友在文章下的留言，告訴我們寫的人心情如何。沒有標準答案，憑直覺就好。</p>"
     "<p class=wv-en>PTT is Taiwan's biggest online forum. Read the comments people leave under its posts and tell us how each writer feels. Your answers help researchers teach software to read Taiwanese online comments. No right or wrong answers.</p>"
     '<div class="wv-steps"><span>① 讀留言</span><span>② 選心情</span><span>③ 按送出</span></div></div>',
