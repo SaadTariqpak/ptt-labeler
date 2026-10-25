@@ -12,7 +12,7 @@ import re
 
 import streamlit as st
 
-st.set_page_config(page_title="PTT 留言標註", page_icon=":material/rate_review:", layout="centered")
+st.set_page_config(page_title="PTT Comment Annotation 留言標註", page_icon=":material/rate_review:", layout="centered")
 
 import labeler_core as rating  # noqa: E402
 
@@ -34,7 +34,8 @@ CSS = """
 .wv-hero { padding: 1.4rem 1.4rem 1.2rem; border-radius: 18px; margin-bottom: 1rem;
            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); color: #fff; }
 .wv-hero h1 { margin: 0 0 .35rem; font-size: 1.9rem; color: #fff; padding: 0; }
-.wv-hero p { margin: 0; font-size: 1.02rem; opacity: .93; line-height: 1.6; }
+.wv-hero p { margin: 0 0 .5rem; font-size: 1.02rem; opacity: .93; line-height: 1.6; }
+.wv-hero .wv-en { font-size: .9rem; opacity: .85; }
 .wv-steps { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .9rem; }
 .wv-steps span { background: rgba(255,255,255,.18); border-radius: 999px; padding: .3rem .85rem; font-size: .92rem; }
 .wv-part { display: flex; align-items: center; gap: .8rem; margin: 1.9rem 0 .8rem; }
@@ -74,7 +75,7 @@ def sign_in() -> str | None:
     if os.getenv("LABELER_OPEN_SIGNIN"):  # temporary: raters type their email, nothing is verified. Use Google login for real raters
         if st.session_state.get("open_email"):
             return st.session_state["open_email"]
-        st.title("PTT 留言標註")
+        st.title("PTT Comment Annotation · PTT 留言標註")
         st.write("請輸入你的 Email 開始。我們只用它來避免重複作答，不會公開。")
         st.caption("Enter your email to start. We only use it to avoid duplicate answers; it is never shown publicly.")
         with st.form("open_signin"):
@@ -84,7 +85,7 @@ def sign_in() -> str | None:
                 st.rerun()
         return None
     if not st.user.get("is_logged_in", False):
-        st.title("PTT 留言標註")
+        st.title("PTT Comment Annotation · PTT 留言標註")
         st.write("請幫忙看看網友在 PTT 留言時的心情是開心、生氣，還是在酸人。每次 25 則，約 3–5 分鐘，可以隨時停下來，也可以繼續做下一組。")
         st.caption("Read some comments from Taiwan's PTT forum and tell us how the writer feels. 25 comments at a time, about 3–5 minutes, stop whenever you like.")
         st.button("用 Google 帳號登入 Sign in with Google", on_click=st.login, type="primary", icon=":material/login:")
@@ -135,8 +136,9 @@ with st.sidebar:
 
 st.markdown(CSS, unsafe_allow_html=True)
 st.markdown(
-    '<div class="wv-hero"><h1>PTT 留言標註</h1>'
-    "<p>看看網友的留言，告訴我們寫的人心情如何。沒有標準答案，憑直覺就好。</p>"
+    '<div class="wv-hero"><h1>PTT Comment Annotation<br>PTT 留言標註</h1>'
+    "<p>PTT 是台灣最大的網路論壇。請看網友在文章下的留言，告訴我們寫的人心情如何。沒有標準答案，憑直覺就好。</p>"
+    "<p class=wv-en>PTT is Taiwan's biggest online forum. Read the comments people leave under its posts and tell us how each writer feels. Your answers help researchers teach software to read Taiwanese online comments. No right or wrong answers.</p>"
     '<div class="wv-steps"><span>① 讀留言</span><span>② 選心情</span><span>③ 按送出</span></div></div>',
     unsafe_allow_html=True)
 instructions()
