@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 import random
+import uuid
 from contextlib import contextmanager
 from datetime import datetime, timezone
 
@@ -52,6 +53,7 @@ class Rating(Base):
     item_id: Mapped[int] = mapped_column(ForeignKey("rating_items.id", ondelete="CASCADE"), index=True)
     rater_email: Mapped[str] = mapped_column(String, index=True)
     label: Mapped[str] = mapped_column(String)
+    submission_id: Mapped[str | None] = mapped_column(String, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
@@ -117,12 +119,16 @@ def next_batch(email: str, category: str | None = None, n: int = BATCH_SIZE, rng
         return [{"id": i.id, "text": i.text, "tag": i.tag, "post_title": i.post_title, "kind": i.kind} for i in picked]
 
 
-def save_ratings(email: str, answers: dict[int, str]) -> int:
-    """Store one rating per (item, rater); repeats and unknown labels are ignored."""
+def save_ratings(email: str, answers: dict[int, str], submission_id: str | None = None) -> int:
+    """Store one rating per (item, rater); repeats and unknown labels are ignored.
+
+    Each call is one attempt sharing a submission_id, so a returning rater's rounds stay separate.
+    """
+    submission_id = submission_id or uuid.uuid4().hex
     with session_scope() as s:
         done = set(s.scalars(select(Rating.item_id).where(Rating.rater_email == email,
                                                           Rating.item_id.in_(list(answers)))))
-        new = [Rating(item_id=i, rater_email=email, label=lab) for i, lab in answers.items()
+        new = [Rating(item_id=i, rater_email=email, label=lab, submission_id=submission_id) for i, lab in answers.items()
                if lab in LABELS and i not in done]
         s.add_all(new)
         return len(new)

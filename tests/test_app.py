@@ -44,3 +44,12 @@ def test_typed_email_then_a_round_is_saved(db, monkeypatch):
     assert not at.exception
     with db.session_scope() as s:
         assert s.scalar(select(func.count()).select_from(db.Rating).where(db.Rating.rater_email == "friend@example.com")) == 25
+
+
+def test_a_returning_rater_gets_a_new_submission_id_each_round(db):
+    for seed in (1, 2):
+        batch = db.next_batch("a@x.com", rng=random.Random(seed))
+        assert db.save_ratings("a@x.com", {i["id"]: "neutral" for i in batch[:10]}) == 10
+    with db.session_scope() as s:
+        ids = set(s.scalars(select(db.Rating.submission_id).where(db.Rating.rater_email == "a@x.com")))
+    assert len(ids) == 2 and None not in ids
